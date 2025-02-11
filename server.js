@@ -2,7 +2,7 @@ const express = require("express");
 const redis = require("redis");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3049;
 
 app.use(express.json());
 

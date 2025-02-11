@@ -60,13 +60,13 @@ Your task is to extract the high-throughput ticket purchasing component (inspire
 
 Simulate high load using a tool like [autocannon](https://github.com/mcollina/autocannon) or [wrk](https://github.com/wg/wrk). For example, to simulate 2000 concurrent connections on event 1:
 
-npx autocannon -c 2000 -d 30 http://localhost:3000/buy/1
+npx autocannon -c 2000 -d 30 http://localhost:3049/buy/1
 
 ### Metrics
 
 Access real-time service metrics at:
 
-http://localhost:3000/metrics
+http://localhost:3049/metrics
 
 These metrics should include data on tickets sold, remaining tickets per event, and any instances where the fallback mechanism was activated.
 
