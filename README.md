@@ -17,6 +17,7 @@ Your task is to extract the high-throughput ticket purchasing component (inspire
 - **Performance and Load Testing:** The service must be designed to handle tens of thousands of requests and be tested under a simulated load of at least 2000 concurrent connections. You should include logging of key performance metrics and purchase statistics.
 - **Design Documentation:** Provide a detailed design document (`design.md`) that explains your architectural decisions, how you ensure scalability, measures to handle potential bottlenecks, and details on your fallback strategy.
 - **Dockerization:** Extend the docker-compose setup to include not only Redis but also (optionally) a Prometheus container to scrape and monitor the metrics from your service.
+- **PDF Ticket Generation:** For every successful ticket purchase, a PDF receipt must be generated. You are free to choose any open-source PDF generation package of your choice (e.g., pdfkit, jsPDF, etc.) to implement this functionality. Ensure that PDF generation is integrated into the purchase flow without significant performance degradation.
 
 ## Requirements
 
@@ -79,7 +80,7 @@ These metrics should include data on tickets sold, remaining tickets per event, 
 - **Logging & Metrics:** Proper logging of operations and a functional metrics endpoint suitable for Prometheus scraping.
 - **Design Rationale:** The design document (`design.md`) should clearly articulate your architectural decisions, potential bottlenecks, and design solutions.
 
-## Bonus Challenges (Optional but Encouraged)
+## Final Challenges
 
 - Enhance your docker-compose setup to include a Prometheus container for live monitoring.
 - Optimize your Redis Lua script for even higher performance and lower latency.

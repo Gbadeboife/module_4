@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="X-UA-Compatible"
+      content="IE=edge"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>ticket</title>
+
+    <style>
+      body {
+          font-family: 'Roboto', sans-serif;
+      }
+      .ferrari {
+          background-image: url(https://s3.us-west-1.amazonaws.com/com.mkdlab.images/baas/nordin/076532395068ferrari.png);
+          background-repeat: no-repeat;
+          background-position: center left;
+      }
+
+      .wing {
+          background-image: url(https://s3.us-west-1.amazonaws.com/com.mkdlab.images/baas/nordin/076532395068wing.png);
+          background-repeat: no-repeat;
+          background-position: center right;
+      }
+    </style>
+  </head>
+  <body class="h-screen w-screen  h-[800px] overflow-x-hidden ">
+    <div class=" js bg-white  grid grid-cols-3  gap-1 bg-[red] p-3 "></div>
+
+    <script>
+        const js = document.querySelector(".js")
+        for(let i = 0 ; i < 240; i++) {
+          js.innerHTML += ` <div class="border-2 border-black border-dashed relative ">
+              <div class="h-[12px] w-full bg-[#B3E1AB]"></div>
+              <div class="flex h-[245px] bg-[#EDF0F3] w-[100%] ">
+                <div class="w-[25%] z-[100]">
+                  <img
+                    class="block w-[96%] h-[50%]"
+                    src="https://s3.us-west-1.amazonaws.com/com.mkdlab.images/baas/nordin/076532395068redLottery.png"
+                    alt="lottery car"
+                  />
+                  <img
+                    class="block w-[98%] h-[50%]"
+                    src="https://s3.us-west-1.amazonaws.com/com.mkdlab.images/baas/nordin/076532395068darkLottery.png"
+                    alt="lottery car"
+                  />
+                </div>
+                <div class="flex h-[inherit] w-[70%] relative">
+                  <div  class="absolute h-full w-[95%] flex flex-col items-center top-0 left-0">
+                    <h4 style="text-align: center;" class="font-[100] text-[#161B24]">LOTERÍA Y APUESTA DE JFPRO</h4>
+                    <div class="flex gap-2 mb-1">
+                      <div class="flex flex-col justify-center items-center mt-1 mb-0">
+                        <h4 class="font-helvatica leading-[2.4rem] mb-2  text-[2rem] font-[700]">1</h4>
+                        <h4 class="text-sm  text-[#5FAF6C]">CERO</h4>
+                      </div>
+
+                      <div class="flex flex-col justify-center items-center mt-1 mb-0">
+                        <h4 class="font-helvatica leading-[2.4rem] mb-2  text-[2rem] font-[700]">3</h4>
+                        <h4 class="text-sm  text-[#5FAF6C]">CERO</h4>
+                      </div>
+
+                      <div class="flex flex-col justify-center items-center mt-1 mb-0">
+                        <h4 class="font-helvatica leading-[2.4rem] mb-2  text-[2rem] font-[700]">6</h4>
+                        <h4 class="text-sm  text-[#5FAF6C]">CERO</h4>
+                      </div>
+
+                      <div class="flex flex-col justify-center items-center mt-1 mb-0">
+                        <h4 class="font-helvatica leading-[2.4rem] mb-2  text-[2rem] font-[700]">7</h4>
+                        <h4 class="text-sm  text-[#5FAF6C]">CERO</h4>
+                      </div>
+
+                      <div class="flex flex-col justify-center items-center mt-1 mb-0">
+                        <h4 class="font-helvatica leading-[2.4rem] mb-2 text-[2rem] font-[700]">7</h4>
+                        <h4 class="text-sm  text-[#5FAF6C]">CERO</h4>
+                      </div>
+                    </div>
+                    <h5 class="font-Icf-regular font-bold tracking-[1.3px] text-[1rem]">SORTEO JFPRO COCHES</h5>
+
+                    <h5 style="font-size: 12px;" class="font-Brh-semibold font-[700] tracking-[1px] leading-[1.4rem] mt-1 text-[1rem] text-center">
+                      1º Premio: FERRARI 488 <br />
+                      2º Premio: MERCEDES G-Wagon
+                    </h5>
+
+                    <img
+                      src="https://s3.us-west-1.amazonaws.com/com.mkdlab.images/baas/nordin/076532395068appLogo.svg"
+                      class="h-[35px]"
+                      alt=""
+                    />
+
+                    <p class="text-sm m-0 mb-14">12 JUNIO 2023 | jfpro.es</p>
+                  </div>
+                  <div class="-ml-[10rem] w-full ferrari overflow-hidden"></div>
+                  <div class=" w-[70%] wing overflow-hidden"></div>
+                </div>
+              </div>
+              <div class="h-[12px] w-full bg-[#B3E1AB]"></div>
+              <img
+                src="https://s3.us-west-1.amazonaws.com/com.mkdlab.images/baas/nordin/076532395068barcode.png"
+                alt="barcode"
+                class="absolute  top-1/2 right-0 transform  -translate-y-1/2"
+              />
+            </div>
+      `
+
+        }
+    </script>
+  </body>
+</html>
