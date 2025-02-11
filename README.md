@@ -6,7 +6,7 @@ This challenge tests your ability to build a highly scalable, multi-event ticket
 
 ## Task Details
 
-Your task is to extract the high-throughput ticket purchasing component (inspired by the original "Nordin" project) and extend it into a full-featured multi-event system. The service will:
+Your task is to extract the high-throughput ticket purchasing component and extend it into a full-featured multi-event system. The service will:
 
 - **Multi-Event Support:** Pre-seed a Redis store with multiple sets of tickets. Each event should have its own ticket pool (e.g., stored with keys like `event:{eventId}:tickets`).
 - **API Endpoints:**
