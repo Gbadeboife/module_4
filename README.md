@@ -14,7 +14,7 @@ Your task is to extract the high-throughput ticket purchasing component and exte
   - `GET /metrics`: Expose real-time metrics (e.g., tickets sold, available tickets per event) in a format compatible with Prometheus.
 - **Atomic Ticket Purchase:** Implement the purchase logic using a Redis Lua script to atomically verify and pop a ticket from the ticket pool. This ensures no duplicate ticket sales even under massive concurrent access.
 - **Fallback Mechanism:** If Redis is unavailable or fails during a purchase operation, gracefully fallback to an in-memory store (with appropriate warnings and logs), ensuring the system remains responsive (for demonstration purposes only, as in-memory stores are not persistent).
-- **Performance and Load Testing:** The service must be designed to handle tens of thousands of requests and be tested under a simulated load of at least 2000 concurrent connections. You should include logging of key performance metrics and purchase statistics.
+- **Performance and Load Testing:** The service must be designed to handle tens of thousands of requests and be tested under a simulated load of at least 5000 concurrent connections. You should include logging of key performance metrics and purchase statistics.
 - **Design Documentation:** Provide a detailed design document (`design.md`) that explains your architectural decisions, how you ensure scalability, measures to handle potential bottlenecks, and details on your fallback strategy.
 - **Dockerization:** Extend the docker-compose setup to include not only Redis but also (optionally) a Prometheus container to scrape and monitor the metrics from your service.
 - **PDF Ticket Generation:** For every successful ticket purchase, a PDF receipt must be generated. You are free to choose any open-source PDF generation package of your choice (e.g., pdfkit, jsPDF, etc.) to implement this functionality. Ensure that PDF generation is integrated into the purchase flow without significant performance degradation.
@@ -26,7 +26,7 @@ Your task is to extract the high-throughput ticket purchasing component and exte
 3. **Atomic Operations with Lua:** Replace simple atomic operations (like LPOP) with a Redis Lua script that handles the ticket purchase process atomically.
 4. **Fallback to In-Memory Store:** Implement a fallback mechanism that activates if Redis operations fail, ensuring continued functionality with clear logging that this is a non-persistent backup.
 5. **Metrics Endpoint:** Provide a `/metrics` endpoint that returns JSON data with real-time statistics (tickets sold, tickets remaining per event, errors, etc.).
-6. **Robust Testing:** Write comprehensive unit tests and integration tests. The integration tests must simulate high load (>=2000 concurrent requests) and prove that no ticket is sold more than once.
+6. **Robust Testing:** Write comprehensive unit tests and integration tests. The integration tests must simulate high load (>=5000 concurrent requests) and prove that no ticket is sold more than once.
 7. **Logging:** Implement detailed logging for purchase operations, errors, and fallback activations.
 8. **Design Document:** Include a `design.md` file that outlines your architecture, scalability considerations, and design rationale.
 9. **Docker Support:** Update the docker-compose file to run Redis and optionally Prometheus. Provide clear instructions for running the entire stack.
@@ -59,9 +59,9 @@ Your task is to extract the high-throughput ticket purchasing component and exte
 
 ### Load Testing
 
-Simulate high load using a tool like [autocannon](https://github.com/mcollina/autocannon) or [wrk](https://github.com/wg/wrk). For example, to simulate 2000 concurrent connections on event 1:
+Simulate high load using a tool like [autocannon](https://github.com/mcollina/autocannon) or [wrk](https://github.com/wg/wrk). For example, to simulate 5000 concurrent connections on event 1:
 
-npx autocannon -c 2000 -d 30 http://localhost:3049/buy/1
+npx autocannon -c 5000 -d 30 http://localhost:3049/buy/1
 
 ### Metrics
 
