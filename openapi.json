@@ -1,0 +1,51 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Ticketing API",
+    "version": "1.0.0",
+    "description": "API documentation for the ticketing service."
+  },
+  "paths": {
+    "/buy/{eventId}": {
+      "post": {
+        "summary": "Purchase a ticket for an event",
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Ticket purchased" },
+          "404": { "description": "No tickets available" },
+          "400": { "description": "Invalid eventId" }
+        }
+      }
+    },
+    "/ticket/{eventId}": {
+      "get": {
+        "summary": "Get a PDF ticket receipt",
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "PDF receipt" },
+          "400": { "description": "Invalid eventId" }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "summary": "Get Prometheus metrics",
+        "responses": { "200": { "description": "Metrics" } }
+      }
+    }
+  }
+}

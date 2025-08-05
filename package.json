@@ -5,13 +5,23 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "seed": "node seed.js"
+    "seed": "node seed.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.2",
-    "redis": "^4.7.0"
+    "jaeger-client": "^3.19.0",
+    "opentracing": "^0.14.7",
+    "pdfkit": "^0.13.0",
+    "redis": "^4.7.1"
+  },
+  "jaeger-client": "^3.22.0",
+  "opentracing": "^0.14.8",
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "supertest": "^6.3.3"
   }
 }

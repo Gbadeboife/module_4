@@ -38,30 +38,72 @@ Your task is to extract the high-throughput ticket purchasing component and exte
 - A `design.md` document explaining your design choices, scalability strategies, and fallback mechanisms.
 - Docker-compose file supporting all necessary services (Redis, your app, and optionally Prometheus for metrics scraping).
 
-## Getting Started
+
+### Getting Started
+
+## Setup, Running Instructions, and Performance Testing Guidelines
 
 ### Prerequisites
 
 - Node.js (v14+ recommended)
 - npm
+- Docker & Docker Compose (recommended for full stack)
 - Redis (installed locally or via Docker, as per the provided docker-compose configuration)
 
-### Setup
+### Setup & Running (Local)
 
-1. Clone the repository.
-2. Install dependencies:
+1. **Clone the repository:**
+   ```sh
+   git clone <repo-url>
+   cd module4_backend_project
+   ```
+2. **Install dependencies:**
+   ```sh
    npm install
-3. (Optional) Copy the environment variable template:
+   ```
+3. **(Optional) Copy environment variable template:**
+   ```sh
    cp .env.example .env
-4. Seed the Redis store with tickets for multiple events. You might modify the seeding script to handle multiple event keys (e.g., `event:1:tickets`, `event:2:tickets`, etc.).
-5. Start the application:
+   ```
+4. **Seed the Redis store with tickets for multiple events:**
+   ```sh
+   npm run seed
+   ```
+5. **Start the application:**
+   ```sh
    npm start
+   ```
 
-### Load Testing
+### Setup & Running (Docker Compose)
 
-Simulate high load using a tool like [autocannon](https://github.com/mcollina/autocannon) or [wrk](https://github.com/wg/wrk). For example, to simulate 5000 concurrent connections on event 1:
+1. **Build and start all services (app, Redis, Prometheus):**
+   ```sh
+   docker-compose up --build
+   ```
+2. **Seed tickets (in another terminal):**
+   ```sh
+   docker-compose exec app npm run seed
+   ```
+3. **Access the app:**
+   - App: [http://localhost:3049/](http://localhost:3049/)
+   - Metrics: [http://localhost:3049/metrics](http://localhost:3049/metrics)
+   - Prometheus: [http://localhost:9090/](http://localhost:9090/)
 
-npx autocannon -c 5000 -d 30 http://localhost:3049/buy/1
+### Performance & Load Testing
+
+You can simulate high load using [autocannon](https://github.com/mcollina/autocannon) or [wrk](https://github.com/wg/wrk). Example for 5000 concurrent connections on event 1:
+
+```sh
+   npx autocannon -c 5000 -d 30 http://localhost:3049/buy/1
+```
+
+Alternatively, use the included integration test script:
+
+```sh
+node test_load.js 1 5000 5000
+```
+
+This will simulate 5000 concurrent purchase requests for event 1 and report tickets sold and errors.
 
 ### Metrics
 
@@ -69,7 +111,7 @@ Access real-time service metrics at:
 
 http://localhost:3049/metrics
 
-These metrics should include data on tickets sold, remaining tickets per event, and any instances where the fallback mechanism was activated.
+These metrics include tickets sold, remaining tickets per event, and fallback activations.
 
 ## Evaluation Criteria
 
