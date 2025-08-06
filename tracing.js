@@ -1,30 +1,31 @@
-// Jaeger tracing initialization for Node.js/Express
-const { initTracer } = require('jaeger-client');
+// Jaeger Tracing setup for Express (OpenTelemetry)
+const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-express');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
+const { Resource } = require('@opentelemetry/resources');
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 
-const config = {
-  serviceName: process.env.JAEGER_SERVICE_NAME || 'ticketing-app',
-  reporter: {
-    logSpans: true,
-    agentHost: process.env.JAEGER_AGENT_HOST || 'localhost',
-    agentPort: parseInt(process.env.JAEGER_AGENT_PORT, 10) || 6831,
-  },
-  sampler: {
-    type: 'const',
-    param: 1,
-  },
-};
+const provider = new NodeTracerProvider({
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'ticketing-service',
+  }),
+});
 
-const options = {
-  logger: {
-    info: function logInfo(msg) {
-      console.log('JAEGER INFO', msg);
-    },
-    error: function logError(msg) {
-      console.error('JAEGER ERROR', msg);
-    },
-  },
-};
+const exporter = new JaegerExporter({
+  endpoint: process.env.JAEGER_ENDPOINT || 'http://jaeger:14268/api/traces',
+});
 
-const tracer = initTracer(config, options);
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.register();
 
-module.exports = tracer;
+registerInstrumentations({
+  instrumentations: [
+    new HttpInstrumentation(),
+    new ExpressInstrumentation(),
+  ],
+});
+
+module.exports = provider;

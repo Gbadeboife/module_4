@@ -1,44 +1,30 @@
 // --- Modularized Imports ---
-// Core dependencies and tracing
+require('./tracing'); // Jaeger tracing initialization
 const express = require("express");
 const redis = require("redis");
 const fs = require("fs");
-const tracer = require('./tracing');
-const opentracing = require('opentracing');
 
 
 // --- App Setup ---
-// Express app and port setup
 const app = express();
 const port = process.env.PORT || 3049;
 app.use(express.json());
 
-// Serve static HTML for demo UI
+// Serve ticket.html at root route
 const path = require('path');
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'ticket.html'));
 });
 
 
-// --- Middleware for Logging Requests & Jaeger Tracing ---
-// Logs each request and attaches a Jaeger span for distributed tracing
+// --- Middleware for Logging Requests ---
 app.use((req, res, next) => {
-  // Logging
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  // Jaeger tracing: extract parent context and start span
-  const parentSpanContext = tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers);
-  const span = tracer.startSpan(`${req.method} ${req.path}`, { childOf: parentSpanContext });
-  req.span = span;
-  res.on('finish', () => {
-    span.setTag('http.status_code', res.statusCode);
-    span.finish();
-  });
   next();
 });
 
 
 // --- In-memory Fallback Store (non-persistent, for demo only) ---
-// Used if Redis is unavailable
 const inMemoryTickets = {};
 let fallbackActive = false;
 let fallbackActivations = 0;
@@ -50,7 +36,6 @@ const metrics = {
 };
 
 // --- Helper: Initialize in-memory store from Redis if possible ---
-// Loads tickets from Redis into memory for fallback mode
 async function initializeFallbackFromRedis() {
   try {
     const keys = await client.keys('event:*:tickets');
@@ -67,12 +52,9 @@ async function initializeFallbackFromRedis() {
 }
 
 // --- Load Lua script for atomic ticket purchase ---
-// NOTE: Atomicity for ticket purchase is handled by the Lua script in Redis.
-// If using a relational DB, you should use transactions for multi-step operations.
 const luaScript = fs.readFileSync(path.join(__dirname, "lua_ticket_pop.lua"), "utf8");
 
 // --- Redis Client Setup ---
-// Connect to Redis and fallback to in-memory if unavailable
 const client = redis.createClient();
 client.connect().catch(async (err) => {
   console.error("Redis connection error, fallback to in-memory store.", err);
@@ -83,7 +65,6 @@ client.connect().catch(async (err) => {
 });
 
 // --- Helper: Pop Ticket (Redis or Fallback) ---
-// Pops a ticket from Redis (atomic via Lua) or from in-memory fallback
 async function popTicket(eventId) {
   const ticketKey = `event:${eventId}:tickets`;
   if (!fallbackActive) {
@@ -124,23 +105,14 @@ async function popTicket(eventId) {
 
 
 // --- Modularized Ticket Routes ---
-// All ticket-related endpoints are in routes/tickets.js
-// --- Serve OpenAPI/Swagger Documentation ---
-// Provides basic API docs at /docs (JSON only; for UI use Swagger Editor or ReDoc)
-app.get('/docs', (req, res) => {
-  res.sendFile(path.join(__dirname, 'openapi.json'));
-});
 const ticketsRouter = require('./routes/tickets')(
   popTicket,
   () => fallbackActive,
-  metrics,
-  tracer,
-  opentracing
+  metrics
 );
 app.use('/', ticketsRouter);
 
 // --- Error Handling Middleware ---
-// Handles errors and returns a consistent API response
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: true, message: 'Internal Server Error', data: null });
