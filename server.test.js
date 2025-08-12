@@ -13,10 +13,16 @@ describe('API Endpoints', () => {
     await request(app).post('/buy/1');
   });
 
-  it('should return metrics with tickets_sold', async () => {
-    const res = await request(app).get('/metrics');
+
+  
+  it('should return metrics as JSON', async () => {
+    const res = await request(app).get('/metrics.json');
     expect(res.statusCode).toBe(200);
-    expect(res.text).toContain('tickets_sold');
+    expect(res.headers['content-type']).toMatch(/application\/json/);
+    expect(res.body).toHaveProperty('ticketsSold');
+    expect(res.body).toHaveProperty('ticketsRemaining');
+    expect(res.body).toHaveProperty('fallbackActivations');
+    expect(res.body).toHaveProperty('errors');
   });
 
   it('should handle ticket purchase', async () => {

@@ -7,8 +7,6 @@
     "start": "node server.js",
     "seed": "node seed.js",
     "test": "jest"
-    "seed": "node seed.js",
-    "test": "jest"
   },
   "keywords": [],
   "author": "",
