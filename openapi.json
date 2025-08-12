@@ -15,13 +15,6 @@
             "in": "path",
             "required": true,
             "schema": { "type": "string", "pattern": "^\\d+$" }
-          },
-          {
-            "name": "format",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string", "enum": ["pdf"] },
-            "description": "If set to 'pdf' or Accept header is application/pdf, returns PDF receipt"
           }
         ],
         "responses": {
