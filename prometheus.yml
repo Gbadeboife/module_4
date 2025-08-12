@@ -4,4 +4,4 @@ scrape_configs:
   - job_name: 'ticket-app'
     metrics_path: /metrics
     static_configs:
-      - targets: ['app:3049']
+      - targets: ['app:3049', 'localhost:3049']

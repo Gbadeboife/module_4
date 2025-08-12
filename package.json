@@ -7,6 +7,8 @@
     "start": "node server.js",
     "seed": "node seed.js",
     "test": "jest"
+    "seed": "node seed.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +16,17 @@
   "dependencies": {
     "express": "^4.21.2",
     "pdfkit": "^0.13.0",
-    "redis": "^4.7.1"
+    "redis": "^4.7.1",
+    "axios": "^1.7.7",
+    "@opentelemetry/sdk-trace-node": "^2.0.1",
+    "@opentelemetry/exporter-jaeger": "^2.0.1",
+    "@opentelemetry/instrumentation": "^0.203.0",
+    "@opentelemetry/sdk-trace-base": "^1.26.0",
+    "@opentelemetry/resources": "^1.26.0",
+    "@opentelemetry/semantic-conventions": "^1.26.0",
+    "@opentelemetry/instrumentation-express": "^0.52.0",
+    "@opentelemetry/instrumentation-http": "latest"
+
   },
   "devDependencies": {
     "jest": "^29.0.0",

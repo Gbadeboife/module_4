@@ -17,9 +17,23 @@ app.get('/', (req, res) => {
 });
 
 
-// --- Middleware for Logging Requests ---
+// --- Middleware for Structured Request Timing Logs ---
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  const startHr = process.hrtime.bigint();
+  res.on('finish', () => {
+    const endHr = process.hrtime.bigint();
+    const durationMs = Number(endHr - startHr) / 1_000_000;
+    const logEntry = {
+      ts: new Date().toISOString(),
+      level: 'info',
+      msg: 'request_completed',
+      method: req.method,
+      url: req.originalUrl || req.url,
+      status: res.statusCode,
+      durationMs: Number(durationMs.toFixed(2)),
+    };
+    console.log(JSON.stringify(logEntry));
+  });
   next();
 });
 
@@ -55,14 +69,43 @@ async function initializeFallbackFromRedis() {
 const luaScript = fs.readFileSync(path.join(__dirname, "lua_ticket_pop.lua"), "utf8");
 
 // --- Redis Client Setup ---
-const client = redis.createClient();
-client.connect().catch(async (err) => {
-  console.error("Redis connection error, fallback to in-memory store.", err);
-  fallbackActive = true;
-  fallbackActivations++;
-  metrics.fallbackActivations = fallbackActivations;
-  await initializeFallbackFromRedis();
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+const client = redis.createClient({ url: redisUrl });
+
+client.on('error', (err) => {
+  console.error('Redis client error:', err);
 });
+
+(async () => {
+  try {
+    await client.connect();
+    console.log(JSON.stringify({ ts: new Date().toISOString(), level: 'info', msg: 'redis_connected', url: redisUrl }));
+    fallbackActive = false;
+  } catch (err) {
+    console.error('Redis initial connection failed, enabling fallback.', err);
+    fallbackActive = true;
+    fallbackActivations++;
+    metrics.fallbackActivations = fallbackActivations;
+    // Do not attempt to copy from Redis if not connected; will try later if it becomes healthy
+  }
+})();
+
+// Periodic health check to auto-recover from fallback when Redis is healthy
+setInterval(async () => {
+  if (!fallbackActive) return;
+  try {
+    if (!client.isOpen) {
+      await client.connect();
+    } else {
+      await client.ping();
+    }
+    // If we reach here, Redis is healthy again
+    console.warn('Redis is healthy again; exiting fallback mode.');
+    fallbackActive = false;
+  } catch (_err) {
+    // still unhealthy; remain in fallback
+  }
+}, 5000);
 
 // --- Helper: Pop Ticket (Redis or Fallback) ---
 async function popTicket(eventId) {
@@ -87,7 +130,10 @@ async function popTicket(eventId) {
       fallbackActivations++;
       metrics.fallbackActivations = fallbackActivations;
       metrics.errors++;
-      await initializeFallbackFromRedis();
+      // Initialize fallback from Redis only if client is currently open
+      if (client.isOpen) {
+        await initializeFallbackFromRedis();
+      }
     }
   }
   // Fallback: in-memory store

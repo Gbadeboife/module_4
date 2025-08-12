@@ -32,17 +32,19 @@ function generateTicketPDF(ticket, eventId) {
 
 
 module.exports = (popTicket, fallbackActive, metrics) => {
-  // POST /buy/:eventId - purchase a ticket for a specific event (returns JSON)
+  // POST /buy/:eventId - purchase a ticket for a specific event
   router.post('/buy/:eventId', validateEventId, async (req, res, next) => {
     const eventId = req.params.eventId;
     try {
       const ticket = await popTicket(eventId);
       if (ticket) {
-        // Return ticket info as JSON
+        // Generate a PDF receipt for the purchased ticket and return Base64 in JSON
+        const pdfBuffer = await generateTicketPDF(ticket, eventId);
+        const pdfBase64 = pdfBuffer.toString('base64');
         return res.json({
           error: false,
-          message: 'Ticket purchased successfully!',
-          data: { ticket, fallback: fallbackActive() }
+          message: 'Ticket purchased successfully! (PDF included as Base64)',
+          data: { ticket, fallback: fallbackActive(), pdfBase64 }
         });
       } else {
         return res.status(404).json({ error: true, message: 'No tickets available', data: { fallback: fallbackActive() } });
@@ -70,6 +72,7 @@ module.exports = (popTicket, fallbackActive, metrics) => {
     }
   });
 
+
   // GET /metrics - Prometheus-compatible metrics endpoint
   router.get('/metrics', (req, res) => {
     let output = '';
@@ -83,6 +86,17 @@ module.exports = (popTicket, fallbackActive, metrics) => {
     output += `errors ${metrics.errors}\n`;
     res.type('text/plain').send(output);
   });
+
+  // GET /metrics.json - JSON metrics for programmatic use
+  router.get('/metrics.json', (req, res) => {
+    res.json({
+      ticketsSold: metrics.ticketsSold,
+      ticketsRemaining: metrics.ticketsRemaining,
+      fallbackActivations: metrics.fallbackActivations,
+      errors: metrics.errors,
+    });
+  });
+
 
   return router;
 };

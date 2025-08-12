@@ -14,11 +14,41 @@
             "name": "eventId",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string", "pattern": "^\\d+$" }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["pdf"] },
+            "description": "If set to 'pdf' or Accept header is application/pdf, returns PDF receipt"
           }
         ],
         "responses": {
-          "200": { "description": "Ticket purchased" },
+          "200": {
+            "description": "Ticket purchased (returns JSON with Base64-encoded PDF)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "ticket": { "type": "string" },
+                        "fallback": { "type": "boolean" },
+                        "pdfBase64": { "type": "string", "description": "Base64-encoded PDF receipt" }
+                      },
+                      "required": ["ticket", "fallback", "pdfBase64"]
+                    }
+                  },
+                  "required": ["error", "message", "data"]
+                }
+              }
+            }
+          },
           "404": { "description": "No tickets available" },
           "400": { "description": "Invalid eventId" }
         }
@@ -32,7 +62,7 @@
             "name": "eventId",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string", "pattern": "^\\d+$" }
           }
         ],
         "responses": {
@@ -41,10 +71,19 @@
         }
       }
     },
+    
     "/metrics": {
       "get": {
         "summary": "Get Prometheus metrics",
-        "responses": { "200": { "description": "Metrics" } }
+        "responses": {
+          "200": {
+            "description": "Metrics",
+            "content": {
+              "text/plain; version=0.0.4": { "schema": { "type": "string" } },
+              "text/plain": { "schema": { "type": "string" } }
+            }
+          }
+        }
       }
     }
   }

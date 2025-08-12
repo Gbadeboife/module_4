@@ -11,13 +11,14 @@ Your task is to extract the high-throughput ticket purchasing component and exte
 - **Multi-Event Support:** Pre-seed a Redis store with multiple sets of tickets. Each event should have its own ticket pool (e.g., stored with keys like `event:{eventId}:tickets`).
 - **API Endpoints:**
   - `POST /buy/:eventId`: Allow a user to purchase a ticket for a specific event.
-  - `GET /metrics`: Expose real-time metrics (e.g., tickets sold, available tickets per event) in a format compatible with Prometheus.
+- `GET /metrics`: Prometheus text format metrics compatible with Prometheus scrapers.
+- `GET /metrics.json`: JSON metrics for programmatic use.
 - **Atomic Ticket Purchase:** Implement the purchase logic using a Redis Lua script to atomically verify and pop a ticket from the ticket pool. This ensures no duplicate ticket sales even under massive concurrent access.
 - **Fallback Mechanism:** If Redis is unavailable or fails during a purchase operation, gracefully fallback to an in-memory store (with appropriate warnings and logs), ensuring the system remains responsive (for demonstration purposes only, as in-memory stores are not persistent).
 - **Performance and Load Testing:** The service must be designed to handle tens of thousands of requests and be tested under a simulated load of at least 5000 concurrent connections. You should include logging of key performance metrics and purchase statistics.
 - **Design Documentation:** Provide a detailed design document (`design.md`) that explains your architectural decisions, how you ensure scalability, measures to handle potential bottlenecks, and details on your fallback strategy.
 - **Dockerization:** Extend the docker-compose setup to include not only Redis but also (optionally) a Prometheus container to scrape and monitor the metrics from your service.
-- **PDF Ticket Generation:** For every successful ticket purchase, a PDF receipt must be generated. You are free to choose any open-source PDF generation package of your choice (e.g., pdfkit, jsPDF, etc.) to implement this functionality. Ensure that PDF generation is integrated into the purchase flow without significant performance degradation.
+- **PDF Ticket Generation:** A PDF receipt is generated for every successful ticket purchase and returned in the JSON response as a Base64-encoded string under `data.pdfBase64`.
 
 ## Requirements
 
@@ -43,13 +44,19 @@ Your task is to extract the high-throughput ticket purchasing component and exte
 
 ## Setup, Running Instructions, and Performance Testing Guidelines
 
+### Getting Started
+
+## Setup, Running Instructions, and Performance Testing Guidelines
+
 ### Prerequisites
 
 - Node.js (v14+ recommended)
 - npm
 - Docker & Docker Compose (recommended for full stack)
+- Docker & Docker Compose (recommended for full stack)
 - Redis (installed locally or via Docker, as per the provided docker-compose configuration)
 
+### Setup & Running (Local)
 ### Setup & Running (Local)
 
 1. **Clone the repository:**
@@ -86,7 +93,8 @@ Your task is to extract the high-throughput ticket purchasing component and exte
    ```
 3. **Access the app:**
    - App: [http://localhost:3049/](http://localhost:3049/)
-   - Metrics: [http://localhost:3049/metrics](http://localhost:3049/metrics)
+  - Metrics (Prometheus): [http://localhost:3049/metrics](http://localhost:3049/metrics)
+  - Metrics (JSON): [http://localhost:3049/metrics.json](http://localhost:3049/metrics.json)
    - Prometheus: [http://localhost:9090/](http://localhost:9090/)
 
 ### Performance & Load Testing
@@ -97,13 +105,15 @@ You can simulate high load using [autocannon](https://github.com/mcollina/autoca
    npx autocannon -c 5000 -d 30 http://localhost:3049/buy/1
 ```
 
-Alternatively, use the included integration test script:
+There is also an automated Jest integration test that fails on any duplicate ticket sold:
 
 ```sh
-node test_load.js 1 5000 5000
-```
+# App must be running and Redis seeded
+npm test -- integration.highload.test.js
 
-This will simulate 5000 concurrent purchase requests for event 1 and report tickets sold and errors.
+# Optional env overrides
+TEST_EVENT_ID=1 TEST_REQUESTS=5000 TEST_BATCH=500 npm test -- integration.highload.test.js
+```
 
 ### Metrics
 

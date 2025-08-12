@@ -38,7 +38,5 @@ describe('API Endpoints', () => {
     expect(res.body).toBeInstanceOf(Buffer);
   });
 
-  afterAll(() => {
-    if (app && app.close) app.close();
-  });
+
 });
